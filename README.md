@@ -39,7 +39,7 @@ input:调用这个函数传入的参数(需要输入)
 - 访问地址获取结果
 访问上面打印的地址,并传入自定义参数：
   
-`http://127.0.0.1:9501?group=df777a58-ff44-41bb-81ce-935b6bea9c25&action=btoa&input="abc"`
+`http://127.0.0.1:9501/call?group=df777a58-ff44-41bb-81ce-935b6bea9c25&action=btoa&input="abc"`
 最终返回的就是：window.btoa("ss")执行的结果
 
 #### 二、路由
