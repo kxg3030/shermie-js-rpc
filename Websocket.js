@@ -39,7 +39,7 @@ function WebsocketClient(host) {
     this.open = function () {
         let _this = this;
         return function (event) {
-            _this.log("info", "连接到服务器成功");
+            _this.log("info", "连接服务器成功");
             // 心跳定时器
             _this.heartbeat();
             // 向服务器发送消息
@@ -51,7 +51,7 @@ function WebsocketClient(host) {
         let _this = this;
         return function (event) {
             let receive = event.data;
-            _this.log("info", "收到服务器发送消息：" + receive);
+            _this.log("info", "收到服务器消息：" + receive);
             // 解析分组和函数参数
             receive = JSON.parse(receive);
             const {group, action, input} = receive.data;
@@ -65,16 +65,19 @@ function WebsocketClient(host) {
             }
             // 调用函数
             try {
-                let result = _this.registeCallMap[group][action](input);
-                _this.log("info", `调用函数${action}返回：${result}`);
-                if (result === undefined) {
-                    result = null;
-                }
-                _this.sendSuccess({result: result, input: input});
+                _this.registeCallMap[group][action](_this.resolve(input, action), input);
             } catch (e) {
                 _this.log("error", "调用函数报错：" + e.message);
                 _this.sendError("调用函数报错：" + e.message);
             }
+        }
+    }
+    // 处理数据
+    this.resolve = function (input, action) {
+        let _this = this;
+        return function (data) {
+            _this.log("info", `调用函数${action}返回：${data}`);
+            _this.sendSuccess({result: data, input: input});
         }
     }
     // 回调函数
@@ -82,7 +85,7 @@ function WebsocketClient(host) {
         let _this = this;
         return function (event) {
             clearInterval(_this.timer)
-            _this.log("info", "客户端断开连接");
+            _this.log("info", "服务器断开连接");
         }
     }
     // 生成客户端id
