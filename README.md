@@ -1,7 +1,7 @@
 #### 一、食用方法
 - 启动服务
 
-进入bin目录,在命令行执行下面的命令
+进入bin目录,在命令行执行下面的命令(cli.exe的下载去我的另一篇文章：https://learnku.com/articles/67419)
 
 ```javascript
 ./cli.exe Websocket.php
