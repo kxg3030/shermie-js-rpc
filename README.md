@@ -7,7 +7,7 @@
 ./cli.exe Websocket.php
 ```
 
-- 浏览器运行 
+- 浏览器运行
 
 1.在浏览器创建Websocket连接(把Websocket.js里面的复制出来粘贴到浏览器命令行运行),会返回一个client对象
 
@@ -15,15 +15,17 @@
 2.在client对象上注册需要调用的js函数
 ```javascript
 # 假设我们需要通过http调用btoa这个函数,第一个参数随便命名,第二个参数是函数执行的内容
-client.registeCall("btoa",function(params){
-    return btoa(params);
+client.registeCall("btoa",function(resolve,params){
+    let result = btoa(params);
+    resolve(result);
 });
 
 # 会输出一个访问地址,比如这样
 
 [2022/4/24 18:16:01][info]  连接到服务器成功
-> client.registeCall("btoa",function(params){
-    return window.btoa(params);
+> client.registeCall("btoa",function(resolve,params){
+    let result = btoa(params);
+    resolve(result);
 });
 [2022/4/24 18:16:52][info]  注册函数btoa成功
 [2022/4/24 18:16:52][info]  访问地址：http://127.0.0.1:9501/call?group=ef8d3da2-dca4-4236-ba99-82f76a5e1901&action=btoa&input=
@@ -37,8 +39,8 @@ input:调用这个函数传入的参数(需要输入)
 ```
 
 - 访问地址获取结果
-访问上面打印的地址,并传入自定义参数：
-  
+  访问上面打印的地址,并传入自定义参数：
+
 `http://127.0.0.1:9501/call?group=df777a58-ff44-41bb-81ce-935b6bea9c25&action=btoa&input="abc"`
 最终返回的就是：window.btoa("ss")执行的结果
 
