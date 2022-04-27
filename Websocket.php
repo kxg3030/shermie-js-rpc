@@ -117,8 +117,17 @@ EOF;
      * @param int $fd
      */
     public function close(Server $server, int $fd) {
-        // TODO 删除内存表中的客户端的fd
-        $this->log(self::CLS_EVENT, "server close websocket client {$fd}");
+        if ($server->isEstablished($fd)) {
+            foreach ($this->group as $row) {
+                if ($row) {
+                    $rowData = json_decode($row["data"], true);
+                    if ($fd == $row["fd"]) {
+                        $this->group->del($rowData["uuid"]);
+                    }
+                }
+            }
+            $this->log(self::CLS_EVENT, "server close websocket client {$fd}");
+        }
     }
 
     /**
@@ -173,18 +182,15 @@ EOF;
                 $data = ["code" => 200, "data" => $params, "msg" => "success"];
                 $this->server->push($fd, json_encode($data, 256), WEBSOCKET_OPCODE_TEXT, true);
                 while (true) {
-                    if (!$this->group->exist($group)) {
-                        continue;
-                    }
                     $receiveData = json_decode($this->group->get($group)["data"], true);
-                    usleep(200);
                     if ($receiveData["data"] ?? null) {
                         $wsData = $receiveData["data"] ?? null;
                         break;
                     }
                 }
-                // 清空数据
-                $this->group->set($group, ["fd" => $fd, "data" => null]);
+                // 清空数据字段再次保存
+                unset($receiveData["data"]);
+                $this->group->set($group, ["fd" => $fd, "data" => json_encode($receiveData, 256)]);
                 $result = ["code" => 200, "data" => $wsData, "msg" => "success"];
                 $response->end(json_encode($result, 256));
                 return;
